@@ -1,0 +1,2 @@
+# DjangoCRM
+Django Project -- Learning
