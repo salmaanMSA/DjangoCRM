@@ -12,7 +12,7 @@
 		<hr>
 		<div class="card card-body">
 			<!-- Button trigger modal -->
-			<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCustomer">
+			<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createCustomer">
 				Create Customer
 			</button>
 			<table class="table table-sm">
@@ -36,7 +36,7 @@
 		<h5>LAST 5 ORDERS</h5>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-primary  btn-sm btn-block" href="">Create Order</a>
+			<a class="btn btn-primary  btn-sm btn-block mb-3" href="">Create Order</a>
 			<table class="table table-sm">
 				<tr>
 					<th>Product</th>
@@ -70,8 +70,8 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body p-4">
-				<form action="{}" method="POST">
-
+				<form action="{% url 'create-customer' %}" method="POST">
+					{% csrf_token %}
 					<!-- Customer name input -->
 					<div class="form-outline mb-4">
 						<label class="form-label" for="name">Customer Name</label>
@@ -87,7 +87,7 @@
 					<!-- Customer email input -->
 					<div class="form-outline mb-4">
 						<label class="form-label" for="email">Customer Email</label>
-						<input type="email" required id="email" name="eamil" class="form-control" />
+						<input type="email" required id="email" name="email" class="form-control" />
 					</div>
 
 					<!-- Submit button -->
