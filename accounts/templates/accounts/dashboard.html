@@ -11,18 +11,21 @@
 		<h5>CUSTOMERS:</h5>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-primary  btn-sm btn-block" href="">Create Customer</a>
+			<!-- Button trigger modal -->
+			<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCustomer">
+				Create Customer
+			</button>
 			<table class="table table-sm">
 				<tr>
+					<th></th>
 					<th>Customer</th>
 					<th>Phone</th>
-					<th>Email</th>
 				</tr>
 				{% for customer in customers%}
 				<tr>
+					<td><a class="btn btn-sm btn-info" href="{% url 'customer' customer.id%}">View</a></td>
 					<td>{{customer.name}}</td>
 					<td>{{customer.phone}}</td>
-					<td>{{customer.email}}</td>
 				</tr>
 				{% endfor %}
 			</table>
@@ -49,13 +52,53 @@
 					<td>{{order.customer}}</td>
 					<td>{{order.date_created}}</td>
 					<td>{{order.status}}</td>
-					<td><a href="">Update</a></td>
-					<td><a href="">Delete</a></td>
+					<td><a class="btn btn-sm btn-warning" href="">Update</a></td>
+					<td><a class="btn btn-sm btn-danger" href="">Delete</a></td>
 				</tr>
 				{% endfor %}
 			</table>
 		</div>
 	</div>
 </div>
+
+<!-- Create Customer Modal -->
+<div class="modal fade" id="createCustomer" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center">
+		<div class="modal-content w-75">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel1">Add New Student</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-4">
+				<form action="{}" method="POST">
+
+					<!-- Customer name input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="name">Customer Name</label>
+						<input type="text" id="name" required name="name" class="form-control" />
+					</div>
+
+					<!-- Customer phone number input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="phone">Customer Phone No</label>
+						<input type="number" required minlength="10" id="phone" name="phone" class="form-control" />
+					</div>
+
+					<!-- Customer email input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="email">Customer Email</label>
+						<input type="email" required id="email" name="eamil" class="form-control" />
+					</div>
+
+					<!-- Submit button -->
+					<div class="text-center">
+						<button type="submit" class="btn btn-primary btn-block text-center">Create Customer</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
 
 {% endblock %}
