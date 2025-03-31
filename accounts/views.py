@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from .models import Product, Order, Customer, Tag
 # Create your views here.
 
+# Template Rendering Views
+
 def home(request):
     orders = Order.objects.all()
     customers = Customer.objects.all()
@@ -47,6 +49,9 @@ def customer(request, id):
     }
     return render(request, 'accounts/customer.html', context)
 
+
+# Create Operation Views
+
 def createCustomer(request):
     if request.method == 'POST':
         name = request.POST['name']
@@ -86,6 +91,9 @@ def createOrder(request):
         new_order.save()
     return redirect('home')
 
+
+# Update Operation Views
+
 def updateOrderDetails(request, id):
     if request.method == 'POST':
         order = Order.objects.get(id=id)
@@ -97,6 +105,9 @@ def updateOrderDetails(request, id):
             order.status = upd_status
         order.save()
     return redirect('home')
+
+
+# Delete Operation Views
 
 def deleteOrder(request, id):
     order = Order.objects.get(id=id)
