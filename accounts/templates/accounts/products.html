@@ -73,36 +73,59 @@
 
 <div class="row">
 	<div class="col-md">
-		<div class="card card-body">
+		<div class="card card-body mb-2">
 			<div class="d-flex justify-content-between align-items-center">
 				<h5 class="m-0">Products</h5>
-				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProduct" 
-					data-categories="{{ categories|join:',' }}" data-tags="{{ tags|join:',' }}">
-					+ Add Product
-				</button>
+				<div class="d-flex gap-2">  <!-- Added wrapper for buttons -->
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProduct" 
+						data-categories="{{ categories|join:',' }}" data-tags="{{ tags|join:',' }}">
+						+ Add Product
+					</button>
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTag">
+						+ Add Tags
+					</button>
+				</div>
 			</div>
 		</div>
-		<div class="card card-body">
-			<table class="table">
-				<tr>
-					<th>Product</th>
-					<th>Category</th>
-					<th>Price</th>
-					<th>Date Created</th>
-					<th>Update</th>
-					<th>Remove</th>
-				</tr>
-				{% for product in products %}
-				<tr>
-					<td>{{product.name}}</td>
-					<td>{{product.category}}</td>
-					<td>{{product.price}}</td>
-					<td>{{product.date_created}}</td>
-					<td><a class="btn btn-sm btn-warning" href="">Update</a></td>
-					<td><a class="btn btn-sm btn-danger" href="">Remove</a></td>
-				</tr>
-				{% endfor %}
-			</table>
+		<div class="row">
+			<div class="col-md-10">
+				<div class="card card-body">
+					<table class="table">
+						<tr>
+							<th>Product</th>
+							<th>Category</th>
+							<th>Price</th>
+							<th>Date Created</th>
+							<th>Update</th>
+							<th>Remove</th>
+						</tr>
+						{% for product in products %}
+						<tr>
+							<td>{{product.name}}</td>
+							<td>{{product.category}}</td>
+							<td>{{product.price}}</td>
+							<td>{{product.date_created}}</td>
+							<td><a class="btn btn-sm btn-warning" href="">Update</a></td>
+							<td><a class="btn btn-sm btn-danger" href="">Remove</a></td>
+						</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div class="card card-body">
+					<table class="table">
+						<tr>
+							<th>Tags</th>
+						</tr>
+						{% for tag in tags %}
+						<tr>
+							<td>{{tag.name}}</td>
+						</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -112,7 +135,7 @@
 	<div class="modal-dialog d-flex justify-content-center">
 		<div class="modal-content w-75">
 			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel1">Add New Student</h5>
+				<h5 class="modal-title" id="exampleModalLabel1">Add New Product</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body p-4">
@@ -169,6 +192,34 @@
 </div>
 <!-- Modal -->
 
+<!-- Create Tag Modal -->
+<div class="modal fade" id="createTag" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center">
+		<div class="modal-content w-75">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel1">Add New Tag</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-4">
+				<form action="{% url 'create-tag' %}" method="POST">
+					{% csrf_token %}
+					<!-- Product name input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="name">Tag Name</label>
+						<input type="text" id="tagName" required name="tagName" class="form-control" />
+					</div>
+
+					<!-- Submit button -->
+					<div class="text-center mt-5">
+						<button type="submit" class="btn btn-primary btn-block text-center">Add Product</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+
 <script>
 	document.addEventListener("DOMContentLoaded", function() {
 		var categoryModal = document.getElementById('createProduct');
@@ -199,7 +250,7 @@
 					<input type="checkbox" class="tag-checkbox" value="${tags.trim()}"> ${tags.trim()}
 				</label>`;
 				tagsList.appendChild(li);
-			})
+			});
 
 			// Handle selection and update button text
 			var checkboxes = document.querySelectorAll('.tag-checkbox');

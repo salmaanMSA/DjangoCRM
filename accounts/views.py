@@ -6,6 +6,7 @@ from .models import Product, Order, Customer, Tag
 def home(request):
     orders = Order.objects.all()
     customers = Customer.objects.all()
+    products = Product.objects.all()
     total_orders = orders.count()
     total_customers = customers.count()
     orders_delivered = orders.filter(status="Delivered").count()
@@ -14,6 +15,7 @@ def home(request):
     context = {
         'orders': orders,
         'customers': customers,
+        'products': products,
         'total_customers': total_customers,
         'total_orders': total_orders,
         'orders_delivered': orders_delivered,
@@ -65,3 +67,39 @@ def createProduct(request):
             tag_list = tags.split(',')
             new_product.tags.set(Tag.objects.filter(name__in=tag_list))
     return redirect('product')
+
+def createTag(request):
+    if request.method == 'POST':
+        tagName = request.POST['tagName']
+        new_tag = Tag(name=tagName)
+        new_tag.save()
+    return redirect('product')
+
+def createOrder(request):
+    if request.method == 'POST':
+        customer_name = request.POST['customer']
+        product_name = request.POST['product']
+        status = request.POST['status']
+        customer = Customer.objects.get(name=customer_name)
+        product = Product.objects.get(name=product_name)
+        new_order = Order(customer=customer, product=product, status=status)
+        new_order.save()
+    return redirect('home')
+
+def updateOrderDetails(request, id):
+    if request.method == 'POST':
+        order = Order.objects.get(id=id)
+        upd_product = request.POST.get('product_upd_order', None) 
+        upd_status = request.POST.get('status_upd_order', None)
+        if upd_product is not None:
+            order.product = Product.objects.get(name=upd_product)
+        if upd_status is not None:
+            order.status = upd_status
+        order.save()
+    return redirect('home')
+
+def deleteOrder(request, id):
+    order = Order.objects.get(id=id)
+    if request.method == 'POST':
+        order.delete()
+    return redirect('home')
