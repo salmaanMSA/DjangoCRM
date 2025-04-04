@@ -106,6 +106,19 @@ def updateOrderDetails(request, id):
         order.save()
     return redirect('home')
 
+def updateCustomerDetails(request, id):
+    if request.method == 'POST':
+        customer = Customer.objects.get(id=id)
+        upd_name = request.POST.get('customer_name', None)
+        upd_phone = request.POST.get('customer_phone', None)
+        if upd_name is not None:
+            customer.name = upd_name
+        if upd_phone is not None:
+            customer.phone = upd_phone
+        customer.save()
+    return redirect('customer', id=id)
+
+
 
 # Delete Operation Views
 
@@ -113,4 +126,12 @@ def deleteOrder(request, id):
     order = Order.objects.get(id=id)
     if request.method == 'POST':
         order.delete()
+    return redirect('home')
+
+def deleteCustomer(request, id):
+    customer = Customer.objects.get(id=id)
+    if request.method == 'POST':
+        customer.delete()
+        print("deleted")
+    print("problem")
     return redirect('home')

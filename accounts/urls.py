@@ -13,8 +13,10 @@ urlpatterns = [
     path('create_order/', views.createOrder, name='create-order'),
 
     # Update urls
-    path('update_order/<str:id>', views.updateOrderDetails, name='update-order'),
+    path('update_order/<str:id>/', views.updateOrderDetails, name='update-order'),
+    path('update_customer/<str:id>/', views.updateCustomerDetails, name='update-customer'),
 
     # Delete urls
-    path('delete_order/<str:id>', views.deleteOrder, name='delete-order')
+    path('delete_order/<str:id>/', views.deleteOrder, name='delete-order'),
+    path('delete_customer/<str:id>/', views.deleteCustomer, name='delete-customer')
 ]

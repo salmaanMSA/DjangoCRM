@@ -9,8 +9,15 @@
 		<div class="card card-body">
 			<h5>Customer:</h5>
 			<hr>
-			<a class="btn btn-outline-warning  btn-sm btn-block m-1" href="">Update Customer</a>
-			<a class="btn btn-outline-danger  btn-sm btn-block m-1" href="">Delete Customer</a>
+			<!-- Button trigger Order Update modal -->
+			<button type="button" class="btn btn-sm btn-outline-warning mb-3" data-bs-toggle="modal" data-bs-target="#updateCustomer" 
+				data-id="{{ customer.id }}" data-name="{{ customer.name }}" data-phone="{{ customer.phone }}" data-email="{{ customer.email }}" >
+				Update Customer
+			</button>
+			<form action="{% url 'delete-customer' customer.id %}" method="POST">
+				{% csrf_token %}
+				<button type="submit" class="btn btn-sm btn-outline-danger mb-3 w-100">Delete</button>
+			</form>
 
 		</div>
 	</div>
@@ -19,6 +26,7 @@
 		<div class="card card-body">
 			<h5>Contact Information</h5>
 			<hr>
+			<p>Name: {{customer.name}}</p>
 			<p>Email: {{customer.email}}</p>
 			<p>Phone: {{customer.phone}}</p>
 		</div>
@@ -73,5 +81,84 @@
 		</div>
 	</div>
 </div>
+
+<!-- Update Customer Modal -->
+<div class="modal fade" id="updateCustomer" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center">
+		<div class="modal-content w-75">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel1">Update Customer Details</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-4">
+				<form action="{% url 'update-customer' 1 %}" method="POST" id="customerUpdateForm">
+					{% csrf_token %}
+					<!-- Customer name input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="customer_name">Customer Name</label>
+						<input type="text" id="customer_name" required name="customer_name" class="form-control" />
+					</div>
+
+					<!-- Customer phone number input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="customer_phone">Customer Phone No</label>
+						<input type="number" required minlength="10" id="customer_phone" name="customer_phone" class="form-control" />
+					</div>
+
+					<!-- Customer email input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="customer_email">Customer Email</label>
+						<input type="email" disabled id="customer_email" name="customer_email" class="form-control" />
+					</div>
+
+					<!-- Submit button -->
+					<div class="text-center">
+						<button type="submit" id="customerUpdateBtn" disabled class="btn btn-primary btn-block text-center">Update Customer</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		var customerUpdateModal = document.getElementById('updateCustomer');
+
+		customerUpdateModal.addEventListener('show.bs.modal', function(event) {
+			// get data from button
+			var button = event.relatedTarget;
+			var customerId = button.getAttribute('data-id');
+			var customerName = button.getAttribute('data-name');
+			var customerPhone = button.getAttribute('data-phone');
+			var customerEmail = button.getAttribute('data-email');
+
+			// Update Form Url Link
+			var form = document.getElementById('customerUpdateForm');
+			form.action = "/update_customer/" + customerId;
+
+			// get input field
+			var nameInput = document.getElementById('customer_name');
+			var phoneInput = document.getElementById('customer_phone');
+			var emailInput = document.getElementById('customer_email');
+
+			// update the field with existing value
+			nameInput.value = customerName;
+			phoneInput.value = customerPhone;
+			emailInput.value = customerEmail;
+
+			// Enable submit button on new data entry
+			var submitBtn = document.getElementById('customerUpdateBtn');
+
+			nameInput.addEventListener('input', function(event) {
+				submitBtn.disabled = false;
+			});
+			phoneInput.addEventListener('input', function(event) {
+				submitBtn.disabled = false;
+			});
+		})
+	})
+</script>
 
 {% endblock %}
