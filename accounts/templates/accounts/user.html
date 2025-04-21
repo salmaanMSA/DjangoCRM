@@ -1,0 +1,108 @@
+{% extends 'accounts/main.html' %}
+
+{% block content %}
+
+{% include 'accounts/status.html' %}
+
+<div class="row justify-content-center">
+	<div class="col-md-9">
+		<h5>YOUR ORDER HISTORY</h5>
+		<hr>
+		<div class="card card-body">
+			<!-- Button trigger Order Create modal -->
+			<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createOrder" 
+				data-products="{{ products|join:',' }}">
+				Create Order
+			</button>
+			<table class="table table-sm">
+				<tr>
+					<th>Product</th>
+                    <th>Category</th>
+                    <th>Quantity</th>
+					<th>Date Orderd</th>
+					<th>Status</th>
+				</tr>
+				{% for order in orders %}
+				<tr>
+					<td>{{order.product}}</td>
+					<td>{{order.product.category}}</td>
+                    <td>{{order.quantity}}</td>
+					<td>{{order.date_created}}</td>
+					<td>{{order.status}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+	</div>
+</div>
+
+<!-- Create Order Modal -->
+<div class="modal fade" id="createOrder" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center">
+		<div class="modal-content w-75">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel1">Add New Order</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-4">
+				<form action="{% url 'customer-create-order' %}" method="POST" id="customerCreateOrderForm">
+					{% csrf_token %}
+
+					<!-- Product Select input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="product">Product</label>
+						<select class="form-select" id="product" name="product">
+							<option value="" selected disabled>Select Product</option>
+						</select>
+					</div>
+
+                    <!-- Quantity Select Input -->
+                    <div class="form-outline mb-4">
+						<label class="form-label" for="quantity">Quantity</label>
+						<input type="number" class="form-control" id="quantity" name="quantity" min="1" max="100" value="1" required>
+					</div>
+
+					<!-- Submit button -->
+					<div class="text-center">
+						<button type="submit" class="btn btn-primary btn-block text-center" id="createOrderBtn" disabled>Create New Order</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var createOrderModal = document.getElementById('createOrder');
+
+        // Event Listener for create order modal
+		createOrderModal.addEventListener('show.bs.modal', function(event) {
+			// get data from the button
+			var button = event.relatedTarget;
+			var productString = button.getAttribute('data-products');
+			var productArray = productString ? productString.split(',') : [];
+
+			// get the input element (Select)
+			var productList = document.getElementById('product');
+
+			// Populate select options
+			productArray.forEach(function(product) {
+				var option = document.createElement('option')
+				option.value = product.trim();
+				option.textContent = product.trim();
+				productList.appendChild(option);
+			});
+
+            // Enable submit button only if product updated
+			var submitBtn = document.getElementById('createOrderBtn');
+			productList.addEventListener('change', function(event) {
+				submitBtn.disabled = false;
+			});
+		});
+    })
+
+</script>
+
+{% endblock %}

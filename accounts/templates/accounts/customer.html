@@ -1,0 +1,414 @@
+{% extends 'accounts/main.html' %}
+
+{% block content %}
+
+<br>
+
+<style>
+	.filter-form {
+	  display: flex;
+	  gap: 10px;
+	  padding: 16px;
+	  border: 1px solid #ccc;
+	  width: fit-content;
+	  background-color: #f9f9f9;
+	  border-radius: 8px;
+	}
+  
+	.filter-row {
+	  display: flex;
+	  align-items: center;
+	  gap: 10px;
+	  margin-right: 30px;
+	}
+  
+	.filter-row label {
+	  min-width: 50px;
+	  font-weight: bold;
+	}
+  
+	.filter-row select,
+	.filter-row input {
+	  padding: 6px;
+	  border: 1px solid #ccc;
+	  border-radius: 4px;
+	  min-width: 200px;
+	}
+  
+	.filter-form button {
+	  align-self: flex-start;
+	  background-color: #007bff;
+	  color: white;
+	  padding: 6px 14px;
+	  border: none;
+	  border-radius: 4px;
+	  cursor: pointer;
+	}
+  
+	.filter-form button:hover {
+	  background-color: #0056b3;
+	}
+  </style>
+  
+
+<div class="row">
+	<div class="col-md">
+		<div class="card card-body">
+			<h5>Customer:</h5>
+			<hr>
+			<!-- Button trigger Order Update modal -->
+			<button type="button" class="btn btn-sm btn-outline-warning mb-3" data-bs-toggle="modal" data-bs-target="#updateCustomer" 
+				data-id="{{ customer.id }}" data-name="{{ customer.name }}" data-phone="{{ customer.phone }}" data-email="{{ customer.email }}" >
+				Update Customer
+			</button>
+			<form action="{% url 'delete-customer' customer.id %}" method="POST">
+				{% csrf_token %}
+				<button type="submit" class="btn btn-sm btn-outline-danger mb-3 w-100">Delete</button>
+			</form>
+
+		</div>
+	</div>
+
+	<div class="col-md">
+		<div class="card card-body">
+			<h5>Contact Information</h5>
+			<hr>
+			<p>Name: {{customer.name}}</p>
+			<p>Email: {{customer.email}}</p>
+			<p>Phone: {{customer.phone}}</p>
+		</div>
+	</div>
+
+	<div class="col-md">
+		<div class="card card-body">
+			<h5>Total Orders</h5>
+			<hr>
+			<h1 style="text-align: center;padding: 10px">{{total_orders}}</h1>
+		</div>
+	</div>
+</div>
+
+
+<br>
+<div class="row">
+	<div class="col">
+		<div class="card card-body d-flex justify-content-center align-items-center">
+			<form method="get" class="filter-form">
+				<div class="filter-row">
+					<h3>Filters</h3>
+				</div>			  
+				<div class="filter-row">
+				  <label for="id_product">Product:</label>
+				  {{ orderFilters.form.product }}
+				</div>
+			  
+				<div class="filter-row">
+				  <label for="id_date_created">Date Created:</label>
+				  {{ orderFilters.form.date_created }}
+				</div>
+			  
+				<div class="filter-row">
+				  <label for="id_status">Status:</label>
+				  {{ orderFilters.form.status }}
+				</div>
+			  
+				<button type="submit">Search</button>
+			</form>
+		</div>
+	</div>
+</div>
+<br>
+
+<div class="row">
+	<div class="col-md">
+		<div class="card card-body">
+			<div class="text-end mb-3">
+				<!-- Button trigger Order Create modal -->
+				<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createOrder" 
+					data-products="{{ products|join:',' }}" data-customer="{{ customer.name }}" data-id = "{{ customer.id }}">
+					+ New Order
+				</button>
+			</div>
+			<table class="table table-sm">
+				<tr>
+					<th>Product</th>
+					<th>Category</th>
+					<th>Date Orderd</th>
+					<th>Status</th>
+					<th>Update</th>
+					<th>Remove</th>
+				</tr>
+				{% for order in orders %}
+					<tr>
+						<td>{{order.product}}</td>
+						<td>{{order.product.category}}</td>
+						<td>{{order.date_created}}</td>
+						<td>{{order.status}}</td>
+						<td>
+							<!-- Button trigger Order Update modal -->
+							<button type="button" class="btn btn-sm btn-warning mb-3" data-bs-toggle="modal" data-bs-target="#updateOrder" 
+								data-products="{{ products|join:',' }}" data-orderId={{order.id}} data-customerId = "{{ customer.id }}"
+								data-orderProduct="{{order.product}}" data-orderStatus="{{order.status}}">
+								Update
+							</button>
+						</td>
+						<td>
+							<form action="{% url 'delete-order' order.id %}" method="POST">
+								{% csrf_token %}
+								<input type="hidden" name="customerId" id="customerId" value="{{ customer.id }}">
+								<button type="submit" class="btn btn-danger btn-sm">Delete</button>
+							</form>
+						</td>
+					</tr>
+				{% endfor %}
+			</table>
+		</div>
+	</div>
+</div>
+
+<!-- Create Order Modal -->
+<div class="modal fade" id="createOrder" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center">
+		<div class="modal-content w-75">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel1">Add New Order</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-4">
+				<form action="{% url 'create-order' 1 %}" method="POST" id="createOrder_customer">
+					{% csrf_token %}
+					<!-- Customer Input Field -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="customer">Customer</label>
+						<input type="text" disabled name="customer" id="customer" class="form-control">
+					</div>
+
+					<!-- Product Select input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="product">Product</label>
+						<select class="form-select" id="product" name="product">
+							<option value="" selected disabled>Select Product</option>
+						</select>
+					</div>
+
+					<!-- Order Status input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="status">Status</label>
+						<select class="form-select" id="status" name="status">
+							<option value="" selected disabled>Select Order Status</option>
+							<option value="Pending">Pending</option>
+							<option value="Out for delivery">Out for delivery</option>
+							<option value="Delivered">Delivered</option>
+						</select>
+					</div>
+
+					<!-- Submit button -->
+					<div class="text-center">
+						<button type="submit" class="btn btn-primary btn-block text-center">Create Order</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+
+<!-- Update Order Modal -->
+<div class="modal fade" id="updateOrder" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center">
+		<div class="modal-content w-75">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel1">Update Order</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-4">
+				<form action="{% url 'update-order' 1 %}" method="POST" id="orderUpdateForm">
+					{% csrf_token %}
+
+					<!-- used for redirection purpose -->
+					<input type="hidden" name="currPage" id="currPage">
+
+					<!-- Product Select input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="product_upd_order">Product</label>
+						<select class="form-select" id="product_upd_order" name="product_upd_order">
+							<option value="" selected disabled>Select Product</option>
+						</select>
+					</div>
+
+					<!-- Order Status input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="status_upd_order">Status</label>
+						<select class="form-select" id="status_upd_order" name="status_upd_order">
+							<option value="Pending">Pending</option>
+							<option value="Out for delivery">Out for delivery</option>
+							<option value="Delivered">Delivered</option>
+						</select>
+					</div>
+
+					<!-- Submit button -->
+					<div class="text-center">
+						<button type="submit" id="orderUpdateBtn" disabled class="btn btn-primary btn-block text-center">Update Order</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+
+<!-- Update Customer Modal -->
+<div class="modal fade" id="updateCustomer" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center">
+		<div class="modal-content w-75">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel1">Update Customer Details</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-4">
+				<form action="{% url 'update-customer' 1 %}" method="POST" id="customerUpdateForm">
+					{% csrf_token %}
+					<!-- Customer name input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="customer_name">Customer Name</label>
+						<input type="text" id="customer_name" required name="customer_name" class="form-control" />
+					</div>
+
+					<!-- Customer phone number input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="customer_phone">Customer Phone No</label>
+						<input type="number" required minlength="10" id="customer_phone" name="customer_phone" class="form-control" />
+					</div>
+
+					<!-- Customer email input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="customer_email">Customer Email</label>
+						<input type="email" disabled id="customer_email" name="customer_email" class="form-control" />
+					</div>
+
+					<!-- Submit button -->
+					<div class="text-center">
+						<button type="submit" id="customerUpdateBtn" disabled class="btn btn-primary btn-block text-center">Update Customer</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		var customerUpdateModal = document.getElementById('updateCustomer');
+		var createOrderModal = document.getElementById('createOrder');
+		var updateOrderModal = document.getElementById('updateOrder');
+
+		createOrderModal.addEventListener('show.bs.modal', function(event) {
+			// get data from the button
+			var button = event.relatedTarget;
+			var productString = button.getAttribute('data-products');
+			var productArray = productString ? productString.split(',') : [];
+			var customerName = button.getAttribute('data-customer');
+			var customerId = button.getAttribute('data-id');
+
+			// update form submit url
+			var form = document.getElementById('createOrder_customer');
+			form.action = "/create_order/" + customerId;
+
+			// get the input element (Select)
+			var productList = document.getElementById('product');
+			var customerNameInput = document.getElementById('customer');
+
+			customerNameInput.value = customerName;
+
+			// Populate select options
+			productArray.forEach(function(product) {
+				var option = document.createElement('option')
+				option.value = product.trim();
+				option.textContent = product.trim();
+				productList.appendChild(option);
+			});
+		});
+
+		customerUpdateModal.addEventListener('show.bs.modal', function(event) {
+			// get data from button
+			var button = event.relatedTarget;
+			var customerId = button.getAttribute('data-id');
+			var customerName = button.getAttribute('data-name');
+			var customerPhone = button.getAttribute('data-phone');
+			var customerEmail = button.getAttribute('data-email');
+
+			// Update Form submit url
+			var form = document.getElementById('customerUpdateForm');
+			form.action = "/update_customer/" + customerId;
+
+			// get input field
+			var nameInput = document.getElementById('customer_name');
+			var phoneInput = document.getElementById('customer_phone');
+			var emailInput = document.getElementById('customer_email');
+
+			// update the field with existing value
+			nameInput.value = customerName;
+			phoneInput.value = customerPhone;
+			emailInput.value = customerEmail;
+
+			// Enable submit button on new data entry
+			var submitBtn = document.getElementById('customerUpdateBtn');
+
+			nameInput.addEventListener('input', function(event) {
+				submitBtn.disabled = false;
+			});
+			phoneInput.addEventListener('input', function(event) {
+				submitBtn.disabled = false;
+			});
+		});
+
+		updateOrderModal.addEventListener('show.bs.modal', function(event) {
+			// get data from button
+			var button = event.relatedTarget;
+			var productString = button.getAttribute('data-products');
+			var productArray = productString ? productString.split(',') : [];
+			var orderProduct = button.getAttribute('data-orderProduct');
+			var orderStatus = button.getAttribute('data-orderStatus');
+			var customerId = button.getAttribute('data-customerId');
+			var orderId = button.getAttribute('data-orderId');
+
+			// update form submit url
+			var form = document.getElementById('orderUpdateForm');
+			form.action = "/update_order/" + orderId;
+			var currPage = document.getElementById('currPage');
+			currPage.value = customerId;
+
+			// update product field
+			var productField = document.getElementById('product_upd_order');
+			productField.innerHTML ="";
+
+			productArray.forEach(function(product) {
+				var option = document.createElement('option');
+				option.value = product.trim();
+				option.textContent = product.trim();
+				option.selected = (product === orderProduct) ? true : false;
+				option.disabled = (product === orderProduct) ? true : false;
+				productField.appendChild(option);
+			});
+
+			// Update Status Field
+			var statusField = document.getElementById('status_upd_order');
+			Array.from(statusField.options).forEach(option => {
+				option.selected = (option.value === orderStatus) ? true : false;
+				option.disabled = (option.value === orderStatus) ? true : false;
+			});
+
+			// Enable submit button only if product or status updated
+			var submitBtn = document.getElementById('orderUpdateBtn');
+			productField.addEventListener('change', function(event) {
+				submitBtn.disabled = false;
+			});
+			statusField.addEventListener('change', function(event) {
+				submitBtn.disabled = false;
+			});
+		})
+	})
+</script>
+
+{% endblock %}

@@ -1,0 +1,408 @@
+{% extends 'accounts/main.html' %}
+
+{% block content %}
+
+<br>
+
+<style>
+	.dropdown {
+		position: relative;
+		font-size: 14px;
+		color: #333;
+	  
+		.dropdown-list {
+		  padding: 12px;
+		  background: #fff;
+		  position: absolute;
+		  top: 30px;
+		  left: 2px;
+		  right: 2px;
+		  box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .15);
+		  transform-origin: 50% 0;
+		  transform: scale(1, 0);
+		  transition: transform .15s ease-in-out .15s;
+		  max-height: 66vh;
+		  overflow-y: scroll;
+		}
+		
+		.dropdown-option {
+		  display: block;
+		  padding: 8px 12px;
+		  opacity: 0;
+		  transition: opacity .15s ease-in-out;
+		}
+		
+		.dropdown-label {
+		  display: block;
+		  height: 30px;
+		  background: #fff;
+		  border: 1px solid #ccc;
+		  padding: 6px 12px;
+		  line-height: 1;
+		  cursor: pointer;
+		  
+		  &:before {
+			content: '▼';
+			float: right;
+		  }
+		}
+		
+		&.on {
+		 .dropdown-list {
+			transform: scale(1, 1);
+			transition-delay: 0s;
+			
+			.dropdown-option {
+			  opacity: 1;
+			  transition-delay: .2s;
+			}
+		  }
+		  
+		  .dropdown-label:before {
+			content: '▲';
+		  }
+		}
+		
+		[type="checkbox"] {
+		  position: relative;
+		  top: -1px;
+		  margin-right: 4px;
+		}
+	  }
+</style>
+
+<div class="row">
+	<div class="col-md">
+		<div class="card card-body mb-2">
+			<div class="d-flex justify-content-between align-items-center">
+				<h5 class="m-0">Products</h5>
+				<div class="d-flex gap-2">  <!-- Added wrapper for buttons -->
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProduct" 
+						data-categories="{{ categories|join:',' }}" data-tags="{{ tags|join:',' }}">
+						+ Add Product
+					</button>
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTag">
+						+ Add Tags
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-10">
+				<div class="card card-body">
+					<table class="table">
+						<tr>
+							<th>Product</th>
+							<th>Category</th>
+							<th>Price</th>
+							<th>Date Created</th>
+							<th>Update</th>
+							<th>Remove</th>
+						</tr>
+						{% for product in products %}
+						<tr>
+							<td>{{product.name}}</td>
+							<td>{{product.category}}</td>
+							<td>{{product.price}}</td>
+							<td>{{product.date_created}}</td>
+							<td>
+								<!-- Button trigger Product Update modal -->
+								<button type="button" class="btn btn-sm btn-warning mb-3" data-bs-toggle="modal" data-bs-target="#updateProduct" 
+									data-prodId="{{ product.id }}" data-prodName="{{ product.name }}" data-prodCategory="{{ product.category }}" 
+									data-prodPrice="{{ product.price }}" data-prodDescription="{{ product.description }}" data-prodTags="{{ product.tags|join:',' }}"
+									 data-categories="{{ categories|join:',' }}">
+									Update
+								</button>
+							</td>
+							<td>
+								<form action="{% url 'delete-product' product.id %}" method="POST">
+									{% csrf_token %}
+									<button type="submit" class="btn btn-danger btn-sm">Delete</button>
+								</form>
+							</td>
+						</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div class="card card-body">
+					<table class="table">
+						<tr>
+							<th>Tags</th>
+							<th>Remove</th>
+						</tr>
+						{% for tag in tags %}
+						<tr>
+							<td>{{tag.name}}</td>
+							<td>
+								<form action="{% url 'delete-tag' tag.id %}" method="POST">
+									{% csrf_token %}
+									<button type="submit" class="btn btn-danger btn-sm">Delete</button>
+								</form>
+							</td>
+						</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Create Product Modal -->
+<div class="modal fade" id="createProduct" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center">
+		<div class="modal-content w-75">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel1">Add New Product</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-4">
+				<form action="{% url 'create-product' %}" method="POST">
+					{% csrf_token %}
+					<!-- Product name input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="name">Product Name</label>
+						<input type="text" id="name" required name="name" class="form-control" />
+					</div>
+
+					<!-- Category input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="cateogry">Category</label>
+						<input list="categoryList" id="categoryInput" name="category" class="form-control" placeholder="Select or enter category">
+						<!-- Datalist (Initially Empty, Filled by JS) -->
+						<datalist id="categoryList"></datalist>
+					</div>
+
+					<!-- Price input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="price">Price</label>
+						<input type="text" required id="price" name="price" class="form-control" />
+					</div>
+
+					<!-- Description Input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="description">Description</label>
+						<input type="text" maxlength="200" id="description" name="description" class="form-control" />
+					</div>
+
+					<!-- Tags Input -->
+					<div class="form-group">
+						<label class="form-label" for="tagDropDown">Tags</label>
+						<div class="dropdown">
+							<button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="tagDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+								Select Tags
+							</button>
+							<ul class="dropdown-menu" aria-labelledby="tagDropdown" id="tagCheckboxList">
+							</ul>
+						</div>
+						<!-- Hidden input to store selected values -->
+						<input type="hidden" name="tag" id="selectedTags">
+					</div>
+
+					<!-- Submit button -->
+					<div class="text-center mt-5">
+						<button type="submit" class="btn btn-primary btn-block text-center">Add Product</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+
+<!-- Create Tag Modal -->
+<div class="modal fade" id="createTag" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center">
+		<div class="modal-content w-75">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel1">Add New Tag</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-4">
+				<form action="{% url 'create-tag' %}" method="POST">
+					{% csrf_token %}
+					<!-- Product name input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="name">Tag Name</label>
+						<input type="text" id="tagName" required name="tagName" class="form-control" />
+					</div>
+
+					<!-- Submit button -->
+					<div class="text-center mt-5">
+						<button type="submit" class="btn btn-primary btn-block text-center">Add Product</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+
+<!-- Update Product Modal -->
+<div class="modal fade" id="updateProduct" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center">
+		<div class="modal-content w-75">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel1">Update Product</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-4">
+				<form action="{% url 'update-product' 1 %}" method="POST" id="productUpdateForm">
+					{% csrf_token %}
+					<!-- Product name input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="prod_upd_name">Product Name</label>
+						<input type="text" id="prod_upd_name" required name="prod_upd_name" class="form-control" />
+					</div>
+
+					<!-- Category input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="prod_upd_category">Category</label>
+						<input list="categoryList_prodUpdate" id="prod_upd_category" name="prod_upd_category" class="form-control" placeholder="Select or enter category">
+						<!-- Datalist (Initially Empty, Filled by JS) -->
+						<datalist id="categoryList_prodUpdate"></datalist>
+					</div>
+
+					<!-- Price input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="prod_upd_price">Price</label>
+						<input type="text" required id="prod_upd_price" name="prod_upd_price" class="form-control" />
+					</div>
+
+					<!-- Description Input -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="prod_upd_description">Description</label>
+						<textarea maxlength="200" id="prod_upd_description" name="prod_upd_description" class="form-control"></textarea>
+					</div>
+
+					<!-- Submit button -->
+					<div class="text-center mt-5">
+						<button type="submit" id="productUpdateBtn" disabled class="btn btn-primary btn-block text-center">Update Order</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+		var productModal = document.getElementById('createProduct');
+		var updateProductModal = document.getElementById('updateProduct');
+	
+		productModal.addEventListener('show.bs.modal', function (event) {
+			var button = event.relatedTarget; // The button that triggered the modal
+			var categoriesString = button.getAttribute('data-categories'); // Get categories
+			var tagsString = button.getAttribute('data-tags');
+			var categoryArray = categoriesString ? categoriesString.split(',') : []; // Convert string to array
+			var tagsArray = tagsString ? tagsString.split(',') : []; // Convert string to array
+			var categoryList = document.getElementById('categoryList');
+			categoryList.innerHTML = ''; // Clear existing options
+	
+			// Populate the datalist with categories
+			categoryArray.forEach(function(category) {
+				var option = document.createElement('option');
+				option.value = category.trim();
+				categoryList.appendChild(option);
+			});
+
+			var tagsList = document.getElementById('tagCheckboxList');
+			tagsList.innerHTML = "";
+
+			// Populate the checkbox list
+			tagsArray.forEach(function(tags) {
+				var li = document.createElement('li');
+				li.innerHTML = `<label class="dropdown-item">
+					<input type="checkbox" class="tag-checkbox" value="${tags.trim()}"> ${tags.trim()}
+				</label>`;
+				tagsList.appendChild(li);
+			});
+
+			// Handle selection and update button text
+			var checkboxes = document.querySelectorAll('.tag-checkbox');
+			var dropdownButton = document.getElementById('tagDropdown');
+			var hiddenInput = document.getElementById('selectedTags');
+	
+			checkboxes.forEach(function(checkbox) {
+				checkbox.addEventListener('change', function() {
+					var selected = [];
+					checkboxes.forEach(function(cb) {
+						if (cb.checked) {
+							selected.push(cb.value);
+						}
+					});
+	
+					// Update button text
+					dropdownButton.textContent = selected.length > 0 ? selected.length + " categories selected" : "Select Categories";
+	
+					// Update hidden input with selected values (comma-separated)
+					hiddenInput.value = selected.join(",");
+				});
+			});
+		});
+		
+		updateProductModal.addEventListener('show.bs.modal', function(event) {
+			var button = event.relatedTarget;
+
+			// get data from button
+			var prodId = button.getAttribute('data-prodId');
+			var prodName = button.getAttribute('data-prodName');
+			var prodCategory = button.getAttribute('data-prodCategory');
+			var prodPrice = button.getAttribute('data-prodPrice');
+			var prodDescription = button.getAttribute('data-prodDescription');
+			var prodTagString = button.getAttribute('data-prodTags')
+			var prodTagArray = prodTagString ? prodTagString.split(',') : [];
+			var categoriesString = button.getAttribute('data-categories');
+			var categoryArray = categoriesString ? categoriesString.split(',') : [];
+
+			// update form submit url
+			var form = document.getElementById('productUpdateForm');
+			form.action = "/update_product/" + prodId;
+
+			// transfer data to input field
+			var prodNameInput = document.getElementById('prod_upd_name');
+			var prodCategoryInput = document.getElementById('prod_upd_category');
+			var productPriceInput = document.getElementById('prod_upd_price');
+			var productDescriptionInput = document.getElementById('prod_upd_description');
+
+			prodNameInput.value = prodName;
+			prodCategoryInput.value = prodCategory;
+			
+			// populate data list as per user input new catgeory
+			prodCategoryInput.addEventListener('input', function() {
+				if (this.value === '') {
+					var categoryList = document.getElementById('categoryList_prodUpdate');
+					categoryList.innerHTML = '';
+					// Populate the datalist with categories
+					categoryArray.forEach(function(category) {
+						var option = document.createElement('option');
+						option.value = category.trim();
+						option.textContent = category.trim();
+						categoryList.appendChild(option);
+					});
+					prodCategoryInput.dispatchEvent(new Event('focus'));
+    				prodCategoryInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+				}
+			});
+			productPriceInput.value = prodPrice;
+			productDescriptionInput.value = prodDescription;
+
+			// Enable Submit Button
+			var sumbitBtn = document.getElementById("productUpdateBtn");
+
+			const inputs = [prodNameInput, prodCategoryInput, productPriceInput, productDescriptionInput];
+
+			inputs.forEach(input => {
+				input.addEventListener('change', () => {
+					sumbitBtn.disabled = false;
+				});
+			});
+		});
+	});
+	
+</script>
+
+{% endblock %}

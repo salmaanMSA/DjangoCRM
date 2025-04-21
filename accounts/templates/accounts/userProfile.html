@@ -1,0 +1,299 @@
+{% extends 'accounts/main.html' %} 
+
+{% block content %} 
+
+<style>
+    .padding {
+        padding: 3rem !important
+    }
+    
+    .user-card-full {
+        overflow: hidden;
+    }
+    
+    .card {
+        border-radius: 5px;
+        -webkit-box-shadow: 0 1px 20px 0 rgba(69,90,100,0.08);
+        box-shadow: 0 1px 20px 0 rgba(69,90,100,0.08);
+        border: none;
+        margin-bottom: 30px;
+    }
+    
+    .m-r-0 {
+        margin-right: 0px;
+    }
+    
+    .m-l-0 {
+        margin-left: 0px;
+    }
+    
+    .user-card-full .user-profile {
+        border-radius: 5px 0 0 5px;
+    }
+    
+    .bg-c-lite-green {
+            background: -webkit-gradient(linear, left top, right top, from(#f29263), to(#ee5a6f));
+        background: linear-gradient(to right, #ee5a6f, #f29263);
+    }
+    
+    .user-profile {
+        padding: 20px 0;
+    }
+    
+    .card-block {
+        padding: 1.25rem;
+    }
+    
+    .m-b-25 {
+        margin-bottom: 25px;
+    }
+    
+    .img-radius {
+        border-radius: 5px;
+    }
+    
+    .w-80 {
+      width: 80%;
+    }
+     
+    h6 {
+        font-size: 14px;
+    }
+    
+    .card .card-block p {
+        line-height: 25px;
+    }
+    
+    @media only screen and (min-width: 1400px){
+    p {
+        font-size: 14px;
+    }
+    }
+    
+    .card-block {
+        padding: 1.25rem;
+    }
+    
+    .b-b-default {
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .m-b-20 {
+        margin-bottom: 20px;
+    }
+    
+    .p-b-5 {
+        padding-bottom: 5px !important;
+    }
+    
+    .card .card-block p {
+        line-height: 25px;
+    }
+    
+    .m-b-10 {
+        margin-bottom: 10px;
+    }
+    
+    .text-muted {
+        color: #919aa3 !important;
+    }
+    
+    .b-b-default {
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .f-w-600 {
+        font-weight: 600;
+    }
+    
+    .m-b-20 {
+        margin-bottom: 20px;
+    }
+    
+    .m-t-40 {
+        margin-top: 20px;
+    }
+    
+    .p-b-5 {
+        padding-bottom: 5px !important;
+    }
+    
+    .m-b-10 {
+        margin-bottom: 10px;
+    }
+    
+    .m-t-40 {
+        margin-top: 20px;
+    }
+    
+    .user-card-full .social-link li {
+        display: inline-block;
+    }
+    
+    .user-card-full .social-link li a {
+        font-size: 20px;
+        margin: 0 10px 0 0;
+        -webkit-transition: all 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
+    }
+</style>
+
+<div class="page-content page-container" id="page-content">
+  <div class="padding">
+    <div class="row container d-flex justify-content-center">
+      <div class="col-xl-6 col-md-12">
+        <div class="card user-card-full">
+          <div class="row m-l-0 m-r-0">
+            <div class="col-sm-4 bg-c-lite-green user-profile">
+              <div class="card-block text-center text-white">
+                <div class="m-b-25">
+                  <img
+                    src="{{ userInfo.profile_pic.url }}"
+                    class="img-radius w-80 rounded-pill"
+                    alt="User-Profile-Image"
+                  />
+                </div>
+                <h6 class="f-w-600">{{ userInfo.name }}</h6>
+                <i
+                  class="mdi mdi-square-edit-outline feather icon-edit m-t-10 f-16"
+                ></i>
+              </div>
+            </div>
+            <div class="col-sm-8">
+              <div class="card-block">
+                <h6 class="m-b-20 p-b-5 b-b-default f-w-600">Information</h6>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <p class="m-b-10 f-w-600">UserName</p>
+                    <h6 class="text-muted f-w-400">{{ userInfo.user }}</h6>
+                  </div>
+                  <div class="col-sm-6">
+                    <p class="m-b-10 f-w-600">Email</p>
+                    <h6 class="text-muted f-w-400">{{ userInfo.email }}</h6>
+                  </div>
+                </div>
+                <div class="row mt-4">
+                  <div class="col-sm-6">
+                    <p class="m-b-10 f-w-600">Phone</p>
+                    <h6 class="text-muted f-w-400">{{ userInfo.phone }}</h6>
+                  </div>
+                </div>
+                <div class="row mt-4">
+                  <div class="col-sm-8 text-end">
+                    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#updateProfile" 
+                      data-name="{{ userInfo.name }}" data-userName="{{ userInfo.user }}" data-email="{{ userInfo.email }}"
+                      data-phone="{{ userInfo.phone }}" data-profilePic="{{ userInfo.profile_pic.url }}">
+                      Edit Profile
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Update Order Modal -->
+<div class="modal fade" id="updateProfile" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center">
+		<div class="modal-content w-75">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel1">Update User Profile</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-4">
+				<form action="{% url 'update-user-profile' %}" method="POST" id="profileUpdateForm" enctype="multipart/form-data">
+					{% csrf_token %}
+					<!-- User Profile Photo -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="profile_pic">Profile Photo</label>
+						<input type="file" class="form-control" id="profile_pic" name="profile_pic" accept="image/*">
+					</div>
+
+					<!-- User's Username -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="username">Username</label>
+						<input type="text" class="form-control" id="username" name="username" disabled>
+					</div>
+
+					<!-- User's Full Name -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="name">Name</label>
+						<input type="text" class="form-control" id="name" name="name">
+					</div>
+
+          <!-- User's email -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="email">Email</label>
+						<input type="email" class="form-control" id="email" name="email">
+					</div>
+
+          <!-- User's phone -->
+					<div class="form-outline mb-4">
+						<label class="form-label" for="phone">Phone</label>
+						<input type="tel" class="form-control" id="phone" name="phone" pattern="[0-9]{10}" maxlength="10" required>
+					</div>
+
+					<!-- Submit button -->
+					<div class="text-center">
+						<button type="submit" id="profileUpdateBtn" disabled class="btn btn-primary btn-block text-center">Update Profile</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var profileUpdateModal = document.getElementById('updateProfile');
+
+    document.addEventListener('show.bs.modal', function(event) {
+      var button = event.relatedTarget;
+
+      // get date from button
+      var profile_photo = button.getAttribute('data-profilePic');
+      var name = button.getAttribute('data-name');
+      var username = button.getAttribute('data-userName');
+      var email = button.getAttribute('data-email');
+      var phone = button.getAttribute('data-phone');
+
+      // get input fields
+      var profilePicInput = document.getElementById('profile_pic');
+      var nameInput = document.getElementById('name');
+      var userNameInput = document.getElementById('username');
+      var emailInput = document.getElementById('email');
+      var phoneInput = document.getElementById('phone');
+
+      // update input fields
+      nameInput.value = name;
+      userNameInput.value = username;
+      emailInput.value = email;
+      phoneInput.value = phone;
+
+      // enable submit btn on field changes
+      var submitBtn = document.getElementById('profileUpdateBtn');
+      profilePicInput.addEventListener('change', function(event) {
+        submitBtn.disabled = false;
+      });
+      nameInput.addEventListener('change', function(event) {
+        submitBtn.disabled = false;
+      });
+      userNameInput.addEventListener('change', function(event) {
+        submitBtn.disabled = false;
+      });
+      emailInput.addEventListener('change', function(event) {
+        submitBtn.disabled = false;
+      });
+      phoneInput.addEventListener('change', function(event) {
+        submitBtn.disabled = false;
+      });
+    })
+  })
+</script>
+
+{% endblock %}
