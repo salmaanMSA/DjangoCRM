@@ -5,6 +5,16 @@ services:
     buildCommand: "./build.sh"
     startCommand: "gunicorn crm.wsgi --bind 0.0.0.0:$PORT"
     envVars:
+      - key: DATABASE_USER
+        value: 'postgres'
+      - key: DATABASE_PASSWORD
+        value: 'Salmaan#1997'
+      - key: DATABASE_HOST
+        value: 'database-2.cfmeogaiioso.ap-south-1.rds.amazonaws.com'
+      - key: EMAIL_HOST_USER
+        value: 'djangotestmail1997@gmail.com'
+      - key: EMAIL_HOST_PASSWORD
+        value: 'unry auzn rrku jlbw'
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
