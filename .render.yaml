@@ -3,7 +3,7 @@ services:
     name: my-django-app
     env: python
     buildCommand: "./build.sh"
-    startCommand: gunicorn crm.wsgi:application --bind 0.0.0.0:$PORT --workers 3"
+    startCommand: gunicorn crm.wsgi:application --bind 0.0.0.0:$PORT --workers 3
     envVars:
       - key: DATABASE_URL
         value: 'postgres://postgres:Salmaan%231997@database-2.cfmeogaiioso.ap-south-1.rds.amazonaws.com:5432/demo_1'
