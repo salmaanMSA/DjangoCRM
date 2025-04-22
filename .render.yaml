@@ -5,8 +5,6 @@ services:
     buildCommand: "./build.sh"
     startCommand: "gunicorn myproject.wsgi"
     envVars:
-      - key: DATABASE_URL
-        value: postgres://postgres:mypassword@database-2.cfmeogaiioso.ap-south-1.rds.amazonaws.com:5432/demo_1
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
