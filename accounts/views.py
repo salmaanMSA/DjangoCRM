@@ -37,13 +37,14 @@ def register(request):
 def employeeEmailVerfication(request):
     if request.method == 'POST':
         userEmail = request.POST.get('email')
+        registration_url = request.build_absolute_uri('/empRegister/')
 
         if userEmail:
             subject = 'Welcome to Our Website'
-            message = '''
+            message = f'''
                 Thankyou for signing up with us, we have verified your company email.
                 Now register your account in our CRM using the link below
-                http://127.0.0.1:8000/empRegister/
+                {registration_url}
              '''
             from_email = settings.EMAIL_HOST_USER  # Make sure it's the same email as the one in EMAIL_HOST_USER
             recipient_list = [userEmail]  # The recipient's email address
